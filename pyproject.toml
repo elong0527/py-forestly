@@ -20,6 +20,7 @@ dev = [
     "ipykernel>=6.30.1",
     "jupyter>=1.1.1",
     "mypy>=1.17.1",
+    "pyre-check>=0.9.25",
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
     "ruff>=0.12.9",
@@ -78,3 +79,7 @@ exclude_lines = [
     "pass",
     "except ImportError:",
 ]
+
+[tool.pyre-check]
+source_directories = ["src"]
+strict = false

@@ -1,0 +1,17 @@
+{
+  "source_directories": [
+    "src"
+  ],
+  "search_path": [
+    {
+      "site-package": "."
+    }
+  ],
+  "strict": false,
+  "version": "0.9.25",
+  "exclude": [
+    ".*/tests/.*",
+    ".*/venv/.*",
+    ".*/\\.venv/.*"
+  ]
+}
