@@ -4,38 +4,38 @@ Python implementation of sparkline_point_js for creating interactive
 Plotly sparklines in reactable tables.
 """
 
-import polars as pl
-from string import Template
 from pathlib import Path
-from typing import Optional
+from string import Template
+
+import polars as pl
 
 
 def sparkline_point_js(
     tbl: pl.DataFrame,
     x: str | list[str],
     type: str = "cell",
-    x_lower: Optional[str | list[str]] = None,
-    x_upper: Optional[str | list[str]] = None,
-    xlim: Optional[tuple[float, float]] = None,
+    x_lower: str | list[str] | None = None,
+    x_upper: str | list[str] | None = None,
+    xlim: tuple[float, float] | None = None,
     xlab: str = "",
-    y: Optional[list[float]] = None,
-    vline: Optional[float] = None,
-    text: Optional[str | list[str]] = None,
+    y: list[float] | None = None,
+    vline: float | None = None,
+    text: str | list[str] | None = None,
     height: float = 30,
     width: float = 150,
     color: str | list[str] = "#FFD700",
-    color_errorbar: Optional[str | list[str]] = None,
+    color_errorbar: str | list[str] | None = None,
     color_vline: str = "#00000050",
     legend: bool = False,
-    legend_label: Optional[list[str]] = None,
+    legend_label: list[str] | None = None,
     legend_title: str = "",
     legend_position: float = 0,
     legend_type: str = "point",
-    margin: Optional[list[int]] = None
+    margin: list[int] | None = None
 ) -> str:
     """
     Generate JavaScript code for Plotly sparkline visualization.
-    
+
     Parameters
     ----------
     tbl : pl.DataFrame
@@ -80,66 +80,66 @@ def sparkline_point_js(
         Type of legend ("point", "line", "point+line").
     margin : list[int] | None
         Margins [bottom, left, top, right, padding].
-        
+
     Returns
     -------
     str
         JavaScript code for the sparkline visualization.
     """
-    
+
     # Set defaults
     if margin is None:
         margin = [0, 0, 0, 0, 0]
-    
+
     if x_upper is None:
         x_upper = x_lower
-    
+
     if color_errorbar is None:
         color_errorbar = color
-    
+
     # Convert single values to lists
     if isinstance(x, str):
         x = [x]
-    
+
     if isinstance(color, str):
         color = [color] * len(x)
-    
+
     if isinstance(color_errorbar, str):
         color_errorbar = [color_errorbar] * len(x)
-    
+
     if y is None:
         y = list(range(1, len(x) + 1))
-    
+
     if text is None:
         text = ['""'] * len(x)
     elif isinstance(text, str):
         text = [text] * len(x)
-    
+
     # Input validation
     for col in x:
         if col not in tbl.columns:
             raise ValueError(f"Column '{col}' not found in DataFrame")
-    
+
     if x_lower is not None:
         if isinstance(x_lower, str):
             x_lower = [x_lower] * len(x)
         for col in x_lower:
             if col not in tbl.columns:
                 raise ValueError(f"Column '{col}' not found in DataFrame")
-    
+
     if x_upper is not None:
         if isinstance(x_upper, str):
             x_upper = [x_upper] * len(x)
         for col in x_upper:
             if col not in tbl.columns:
                 raise ValueError(f"Column '{col}' not found in DataFrame")
-    
+
     # Convert colors to RGBA format
     def to_rgba(color_name: str) -> str:
         """Convert color name to rgba string."""
         # Remove whitespace
         color_str = color_name.strip()
-        
+
         # Check if it's a hex color
         if color_str.startswith('#'):
             try:
@@ -154,23 +154,23 @@ def sparkline_point_js(
                     return f'"rgba({r}, {g}, {b}, 1)"'
             except ValueError:
                 pass
-        
+
         # Check if it's an rgb/rgba color
         if color_str.lower().startswith('rgb'):
             # Already in the right format, just ensure quotes
             return f'"{color_str}"'
-        
+
         # For any other format, return as-is (let the browser handle it)
         return f'"{color_name}"'
-    
+
     # Prepare JavaScript variables
     if type == "cell":
         js_x = ", ".join([f'cell.row["{col}"]' for col in x])
     else:
         js_x = ", ".join(map(str, range(len(color))))
-    
+
     js_y = ", ".join(map(str, y))
-    
+
     if x_lower is None or type in ("footer", "header"):
         js_x_lower = "0"
         js_x_upper = "0"
@@ -178,7 +178,7 @@ def sparkline_point_js(
     else:
         js_x_lower = ", ".join([f'cell.row["{col}"]' for col in x_lower])
         js_x_upper = ", ".join([f'cell.row["{col}"]' for col in x_upper])
-    
+
     # Calculate x range if not provided
     if xlim is None:
         x_vals = []
@@ -189,24 +189,24 @@ def sparkline_point_js(
             xlim = (min(x_vals) - 0.5, max(x_vals) + 0.5)
         else:
             xlim = (0, 1)
-    
+
     js_x_range = f"{xlim[0]}, {xlim[1]}"
     js_y_range = f"0, {len(x) + 1}"
-    
+
     js_text = ", ".join(text)
     js_vline = str(vline) if vline is not None else "[]"
     js_height = str(height)
     js_width = str(width)
-    
+
     js_color = ", ".join([to_rgba(c) for c in color])
     js_color_errorbar = ", ".join([to_rgba(c) for c in color_errorbar])
     js_color_vline = to_rgba(color_vline)
-    
+
     js_xlab = xlab
     js_showlegend = "true" if legend else "false"
     js_legend_title = legend_title
     js_legend_position = str(legend_position)
-    
+
     # Convert legend type
     legend_type_map = {
         "point": "markers",
@@ -214,10 +214,10 @@ def sparkline_point_js(
         "point+line": "markers+lines"
     }
     js_legend_type = legend_type_map.get(legend_type, "markers")
-    
+
     js_legend_label = ", ".join([f'"{label}"' for label in legend_label]) if legend_label else ""
     js_margin = ", ".join(map(str, margin))
-    
+
     # Create data trace
     data_traces = []
     for i in range(len(x)):
@@ -250,16 +250,16 @@ def sparkline_point_js(
         }}
     }}"""
         data_traces.append(trace)
-    
+
     data_trace = ",\n      ".join(data_traces)
-    
+
     # Read the template from the same directory
     template_path = Path(__file__).parent / "sparkline.js"
-    with open(template_path, 'r') as f:
+    with open(template_path) as f:
         template_content = f.read()
-    
+
     template = Template(template_content)
-    
+
     # Substitute variables
     js_code = template.safe_substitute(
         js_x=js_x,
@@ -283,5 +283,5 @@ def sparkline_point_js(
         js_legend_label=js_legend_label,
         data_trace=data_trace
     )
-    
+
     return js_code

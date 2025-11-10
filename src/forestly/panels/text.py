@@ -11,7 +11,7 @@ class TextPanel(Panel):
 
     group_by: list[str] = Field(default_factory=list, description="Columns to group by")
     align: str = Field(default="center", description="Alignment for columns: 'left', 'center', or 'right'")
-    
+
     @field_validator('group_by', 'labels', 'variables', mode='before')
     @classmethod
     def normalize_to_list(cls, v: str | list[str]) -> list[str]:
@@ -19,7 +19,7 @@ class TextPanel(Panel):
         if isinstance(v, str):
             return [v]
         return v if v else []
-    
+
     @field_validator('align')
     @classmethod
     def validate_align(cls, v: str) -> str:
@@ -29,7 +29,7 @@ class TextPanel(Panel):
             raise ValueError(f"align must be one of {allowed}, got '{v}'")
         return v
 
-    def render(self, data: pl.DataFrame) -> dict:
+    def render(self, data: pl.DataFrame) -> dict[str, str | list[str] | int | list[int] | pl.DataFrame | float | tuple[float, float] | None]:
         """Render panel data for display.
 
         Args:
@@ -38,7 +38,7 @@ class TextPanel(Panel):
         Returns:
             Rendered data dictionary
         """
-        result = {"data": data}
+        result: dict[str, str | list[str] | int | list[int] | pl.DataFrame | float | tuple[float, float] | None] = {"data": data}
 
         if self.variables:
             result["columns"] = self.variables

@@ -1,7 +1,7 @@
 """Reactable exporter for forest plot system."""
 
 import polars as pl
-from reactable import Column, Reactable, JS, Theme, ColGroup
+from reactable import JS, ColGroup, Column, Reactable, Theme
 
 from forestly.core.forest_plot import ForestPlot
 from forestly.panels.sparkline import SparklinePanel
@@ -24,10 +24,10 @@ class ReactableExporter:
         data = forest_plot.get_prepared_data()
         forest_plot.prepare_panels()
         group_by = forest_plot.get_grouping_columns()
-        
+
         # Create columns and column groups from panels
         columns, column_groups = self._create_columns_and_groups(forest_plot.panels, forest_plot.config, forest_plot.get_used_columns())
-        
+
         # Build and return Reactable
         return self._build_reactable(data, columns, column_groups, group_by, forest_plot.config)
 
@@ -61,7 +61,7 @@ class ReactableExporter:
                 # Track displayed columns
                 for col in panel_columns:
                     display_columns.add(col.id)
-        
+
         # Add hidden columns for data that's not displayed but needed for sparklines
         for col_name in used_columns:
             if col_name not in display_columns:
@@ -108,13 +108,13 @@ class ReactableExporter:
             widths = panel.get_width_list(len(variables))
 
             # Create columns for each variable
-            for var, label, width in zip(variables, labels, widths):
+            for var, label, width in zip(variables, labels, widths, strict=False):
                 # Determine display name based on context
                 if panel.title and len(variables) == 1:
                     display_name = panel.title
                 else:
                     display_name = label
-                
+
                 col_args = {
                     "id": var,
                     "name": display_name,
@@ -123,7 +123,7 @@ class ReactableExporter:
 
                 if width:
                     col_args["width"] = width
-                
+
                 # Use panel's alignment setting
                 col_args["align"] = panel.align
 
@@ -161,7 +161,7 @@ class ReactableExporter:
 
         if panel.variables:
             variables = panel.variables
-            
+
             # Generate JavaScript if not provided
             if not panel.js_function:
                 # Use panel's generate_javascript method with type="cell" for main sparkline
@@ -171,7 +171,7 @@ class ReactableExporter:
                     font_size=config.font_size
                 )
             js_func = panel.js_function
-            
+
             # Use first variable as column ID
             col_args = {
                 "id": variables[0],
@@ -180,10 +180,10 @@ class ReactableExporter:
                 "v_align": "center",
                 "align": "center"
             }
-            
+
             if panel.width:
                 col_args["width"] = panel.width
-            
+
             # Handle footer display: combine custom footer text with x-axis/legend
             if panel.show_x_axis or panel.show_legend:
                 # Generate footer JavaScript with x-axis and/or legend
@@ -206,12 +206,12 @@ class ReactableExporter:
                     col_args["footer"] = JS(panel.footer)
                 else:
                     col_args["footer"] = panel.footer
-            
+
             columns.append(Column(**col_args))
 
         return columns
 
-    def _build_reactable(self, data: pl.DataFrame, columns: list[Column], 
+    def _build_reactable(self, data: pl.DataFrame, columns: list[Column],
                         column_groups: list[ColGroup], group_by: list[str], config) -> Reactable:
         """Build Reactable with configuration.
 
@@ -243,7 +243,7 @@ class ReactableExporter:
                 style={"fontSize": f"{config.font_size}px"}
             ),
         }
-        
+
         # Add column groups if any
         if column_groups:
             reactable_args["column_groups"] = column_groups
@@ -256,10 +256,10 @@ class ReactableExporter:
             else:
                 # For multiple group columns (nested grouping)
                 reactable_args["group_by"] = group_by
-            
+
             # Set default expanded to True so nested rows are visible by default
             reactable_args["default_expanded"] = True
-            
+
             # Enable pagination for sub rows
             reactable_args["paginate_sub_rows"] = True
 

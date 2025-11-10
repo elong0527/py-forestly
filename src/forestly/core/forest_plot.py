@@ -96,17 +96,19 @@ class ForestPlot(BaseModel):
         Returns:
             Reactable object
         """
-        from forestly.exporters.reactable import ReactableExporter
-        from IPython.display import display, HTML
         from pathlib import Path
-        
+
+        from IPython.display import HTML, display
+
+        from forestly.exporters.reactable import ReactableExporter
+
         # Load JavaScript dependencies for sparkline visualization from file
         deps_file = Path(__file__).parent.parent / "panels" / "templates" / "plotly_deps.js"
-        with open(deps_file, "r") as f:
+        with open(deps_file) as f:
             js_deps_content = f.read()
-        
+
         js_deps = f"<script>\n{js_deps_content}\n</script>"
-        
+
         # Display the JavaScript dependencies
         display(HTML(js_deps))
 
@@ -174,46 +176,46 @@ class ForestPlot(BaseModel):
         # Import here to avoid circular imports
         from ..panels.sparkline import SparklinePanel
         from ..panels.text import TextPanel
-        
+
         used_columns = []
         seen = set()
-        
+
         for panel in self.panels:
             panel_columns = []
-            
+
             if isinstance(panel, TextPanel):
                 # Add group_by columns first
                 if panel.group_by:
                     panel_columns.extend(panel.group_by)
-                
+
                 # Then add variable columns
                 if panel.variables:
                     panel_columns.extend(panel.variables)
-                        
+
             elif isinstance(panel, SparklinePanel):
                 # For SparklinePanel, we need all the columns it uses
                 # Add main variable columns
                 if panel.variables:
                     panel_columns.extend(panel.variables)
-                
+
                 # Add lower bound columns
                 if panel.lower:
                     panel_columns.extend(panel.lower)
-                
+
                 # Add upper bound columns
                 if panel.upper:
                     panel_columns.extend(panel.upper)
-                
+
                 # Add reference line column if it's a column name
                 if panel.reference_line and isinstance(panel.reference_line, str):
                     panel_columns.append(panel.reference_line)
-            
+
             # Add panel columns to used_columns, avoiding duplicates
             for col in panel_columns:
                 if col not in seen:
                     seen.add(col)
                     used_columns.append(col)
-        
+
         return used_columns
 
     def get_prepared_data(self) -> pl.DataFrame:
@@ -228,13 +230,13 @@ class ForestPlot(BaseModel):
     def prepare_panels(self) -> None:
         """Prepare panels with data-specific configuration."""
         data = self.get_prepared_data()
-        
+
         # Import here to avoid circular imports
         from ..panels.sparkline import SparklinePanel
-        
+
         # Collect all SparklinePanel instances
         sparkline_panels = [p for p in self.panels if isinstance(p, SparklinePanel)]
-        
+
         # Compute shared xlim for all sparkline panels (even if just one)
         if sparkline_panels:
             shared_xlim = SparklinePanel.compute_shared_xlim(sparkline_panels, data)
@@ -242,7 +244,7 @@ class ForestPlot(BaseModel):
             for panel in sparkline_panels:
                 if not panel.xlim:
                     panel.xlim = shared_xlim
-        
+
         # Let each panel handle any other preparation
         for panel in self.panels:
             panel.prepare(data)
@@ -255,7 +257,7 @@ class ForestPlot(BaseModel):
         """
         # Import here to avoid circular imports
         from ..panels.text import TextPanel
-        
+
         for panel in self.panels:
             if isinstance(panel, TextPanel) and panel.group_by:
                 return panel.group_by

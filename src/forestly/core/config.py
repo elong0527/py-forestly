@@ -1,6 +1,6 @@
 """Configuration module for forest plot system."""
 
-from typing import Callable
+from collections.abc import Callable
 
 from pydantic import BaseModel, Field
 
@@ -16,7 +16,7 @@ class Config(BaseModel):
     colors: list[str] | None = None
     reference_line_color: str = "#00000050"
 
-    formatters: dict[str, Callable] | None = None
+    formatters: dict[str, Callable[..., str]] | None = None
 
     title: str | None = None
     footnote: str | None = None
