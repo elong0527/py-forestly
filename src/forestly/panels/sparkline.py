@@ -35,7 +35,7 @@ class SparklinePanel(Panel):
     )
     height: int | None = Field(default=None, description="Custom height for sparkline")
 
-    @field_validator("labels", "lower", "upper", "variables", mode="before")
+    @field_validator("labels", "lower", "upper", "variables", mode="before")  # pyre-fixme[56]
     @classmethod
     def normalize_to_list(cls, v: str | list[str]) -> list[str]:
         """Normalize all string/list fields to list format."""
@@ -43,7 +43,7 @@ class SparklinePanel(Panel):
             return [v]
         return v if v else []
 
-    @field_validator("legend_type")
+    @field_validator("legend_type")  # pyre-fixme[56]
     @classmethod
     def validate_legend_type(cls, v: str) -> str:
         """Validate legend type is one of allowed values."""
@@ -52,7 +52,7 @@ class SparklinePanel(Panel):
             raise ValueError(f"legend_type must be one of {allowed}, got '{v}'")
         return v
 
-    @field_validator("margin")
+    @field_validator("margin")  # pyre-fixme[56]
     @classmethod
     def validate_margin(cls, v: list[float] | None) -> list[float] | None:
         """Validate margin has exactly 5 values if provided."""
@@ -62,7 +62,7 @@ class SparklinePanel(Panel):
             )
         return v
 
-    @field_validator("legend_position")
+    @field_validator("legend_position")  # pyre-fixme[56]
     @classmethod
     def validate_legend_position(cls, v: float | None) -> float | None:
         """Validate legend position is between 0 and 1."""
@@ -70,7 +70,7 @@ class SparklinePanel(Panel):
             raise ValueError(f"legend_position must be between 0 and 1, got {v}")
         return v
 
-    @field_validator("xlim")
+    @field_validator("xlim")  # pyre-fixme[56]
     @classmethod
     def validate_xlim(cls, v: tuple[float, float] | None) -> tuple[float, float] | None:
         """Validate xlim is a tuple of two floats with min < max."""
@@ -81,7 +81,7 @@ class SparklinePanel(Panel):
                 raise ValueError(f"xlim[0] must be less than xlim[1], got {v[0]} >= {v[1]}")
         return v
 
-    @model_validator(mode="after")
+    @model_validator(mode="after")  # pyre-fixme[56]
     def validate_confidence_bounds(self) -> "SparklinePanel":
         """Validate that lower and upper bounds are provided together."""
         # Check if exactly one is provided (not both empty, not just one)

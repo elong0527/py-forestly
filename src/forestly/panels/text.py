@@ -14,7 +14,7 @@ class TextPanel(Panel):
         default="center", description="Alignment for columns: 'left', 'center', or 'right'"
     )
 
-    @field_validator("group_by", "labels", "variables", mode="before")
+    @field_validator("group_by", "labels", "variables", mode="before")  # pyre-fixme[56]
     @classmethod
     def normalize_to_list(cls, v: str | list[str]) -> list[str]:
         """Normalize all string/list fields to list format."""
@@ -22,7 +22,7 @@ class TextPanel(Panel):
             return [v]
         return v if v else []
 
-    @field_validator("align")
+    @field_validator("align")  # pyre-fixme[56]
     @classmethod
     def validate_align(cls, v: str) -> str:
         """Validate alignment is one of allowed values."""

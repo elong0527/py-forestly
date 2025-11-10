@@ -16,7 +16,7 @@ class ForestPlot(BaseModel):
     panels: list[Panel]
     config: Config = Field(default_factory=Config)
 
-    @field_validator("data")
+    @field_validator("data")  # pyre-fixme[56]
     @classmethod
     def validate_data(cls, v: pl.DataFrame) -> pl.DataFrame:
         """Validate input data.
@@ -34,7 +34,7 @@ class ForestPlot(BaseModel):
             raise ValueError("Data cannot be empty")
         return v
 
-    @field_validator("panels")
+    @field_validator("panels")  # pyre-fixme[56]
     @classmethod
     def validate_panels(cls, v: list[Panel]) -> list[Panel]:
         """Validate panels.

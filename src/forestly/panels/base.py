@@ -17,7 +17,7 @@ class Panel(BaseModel, ABC):
     width: int | list[int] | None = Field(default=None, description="Width configuration")
     footer: str = Field(default="", description="Panel footer text")
 
-    @field_validator("labels", "variables", mode="before")
+    @field_validator("labels", "variables", mode="before")  # pyre-fixme[56]
     @classmethod
     def normalize_to_list(cls, v: str | list[str]) -> list[str]:
         """Normalize all string/list fields to list format."""
