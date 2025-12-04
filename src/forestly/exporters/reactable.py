@@ -126,7 +126,7 @@ class ReactableExporter:
                     display_name = label
 
                 # Create Column with explicit parameters
-                width_val: int | None = width if width else None
+                col_width_val: int | None = width if width else None
                 cell_formatter = None
 
                 # Apply formatter if specified
@@ -142,7 +142,7 @@ class ReactableExporter:
                     id=var,
                     name=display_name,
                     v_align="center",
-                    width=width_val,
+                    width=col_width_val,
                     align=panel.align if panel.align in ["left", "right", "center"] else "center",
                     cell=cell_formatter,
                 )
@@ -210,7 +210,7 @@ class ReactableExporter:
                 v_align="center",
                 align="center",
                 width=width_val,
-                footer=footer_val if isinstance(footer_val, (type(None), JS)) else None,
+                footer=footer_val if isinstance(footer_val, JS) else None,
             )
             columns.append(column)
 

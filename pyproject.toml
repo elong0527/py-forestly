@@ -54,6 +54,7 @@ warn_unused_configs = true
 no_implicit_reexport = true
 namespace_packages = true
 ignore_missing_imports = true
+exclude = ["planning"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

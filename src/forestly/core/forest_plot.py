@@ -54,7 +54,7 @@ class ForestPlot(BaseModel):
             raise ValueError("At least one panel must be provided")
         return v
 
-    def model_post_init(self, __context) -> None:
+    def model_post_init(self, __context: Any) -> None:
         """Post-initialization validation."""
         self._validate_columns()
 
@@ -112,7 +112,7 @@ class ForestPlot(BaseModel):
         js_deps = f"<script>\n{js_deps_content}\n</script>"
 
         # Display the JavaScript dependencies
-        display(HTML(js_deps))
+        display(HTML(js_deps))  # type: ignore
 
         exporter = ReactableExporter()
         return exporter.export(self)
@@ -237,9 +237,9 @@ class ForestPlot(BaseModel):
         if sparkline_panels:
             shared_xlim = SparklinePanel.compute_shared_xlim(sparkline_panels, data)
             # Apply shared xlim to all panels that don't have explicit xlim
-            for panel in sparkline_panels:
-                if not panel.xlim:
-                    panel.xlim = shared_xlim
+            for sp_panel in sparkline_panels:
+                if not sp_panel.xlim:
+                    sp_panel.xlim = shared_xlim
 
         # Let each panel handle any other preparation
         for panel in self.panels:

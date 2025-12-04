@@ -342,8 +342,8 @@ class SparklinePanel(Panel):
                         max_vals.append(col_data.max())
 
         if min_vals and max_vals:
-            data_min = float(min(min_vals))
-            data_max = float(max(max_vals))
+            data_min = float(min(min_vals))  # type: ignore
+            data_max = float(max(max_vals))  # type: ignore
 
             # Include reference lines in the range calculation
             if reference_lines:
