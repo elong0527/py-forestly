@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+### Added
+
+- support python 3.13
+
 ## 0.1.1
 
 ### Bug Fixes
