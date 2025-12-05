@@ -84,6 +84,7 @@ addopts = [
     "--cov=src/forestly",
     "--cov-report=term-missing",
     "--cov-report=html",
+    "--cov-report=xml",
     "-v"
 ]
 
